@@ -23,14 +23,46 @@ The framework requires ATLAS simulation data in specific formats:
 
 ### Option 2: Raw CSV files (For full preprocessing pipeline)
 ```
-/eos/user/f/fatsai/TrackOverlayDATA/MCOverlay_JZ7/*.csv
-/eos/user/f/fatsai/TrackOverlayDATA/TrackOverlay_JZ7/*.csv
+/eos/user/f/fatsai/TrackOverlayDATA/MCOverlay_JZ7W/*.csv
+/eos/user/f/fatsai/TrackOverlayDATA/TrackOverlay_JZ7W/*.csv
 ```
-
 **Access:** These datasets are stored on CERN EOS and require ATLAS collaboration access rights.
 
 **To request access:**
 - Contact: fang-ying.tsai@cern.ch
+
+**Expected directory structure:**
+```
+data/
+├── MC-overlay_JZ7W/
+│   ├── file1.csv
+│   ├── file2.csv
+│   └── ...
+└── Track-overlay_JZ7W/
+    ├── file1.csv
+    ├── file2.csv
+    └── ...
+```
+**For different samples, use the sample name in the directory:**
+```
+data/
+├── MC-overlay_ttbar/
+│   └── *.csv
+├── Track-overlay_ttbar/
+│   └── *.csv
+├── MC-overlay_JZ7W/
+│   └── *.csv
+└── Track-overlay_JZ7W/
+    └── *.csv
+```
+**Setting up your data:**
+```bash
+# Create directories for your sample
+mkdir -p data/MC-overlay_ttbar
+mkdir -p data/Track-overlay_ttbar
+
+and copy or link your CSV files accordingly.
+```
 
 ## Quick Start
 
@@ -55,8 +87,8 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 # Create virtual environment and install dependencies
 uv venv
 source .venv/bin/activate
-uv pip install -e .
-uv run python scripts/prepare_data.py --sample ttbar --path data
+#uv pip install -e .
+uv run python scripts/prepare_data.py --sample JZ7W --path data
 ```
 
 **Option B: Using Conda**
@@ -77,12 +109,12 @@ pip install "tensorflow>=2.8.0" "numpy>=1.21.0" "pandas>=1.3.0" "scikit-learn>=1
 **Example:**
 ```bash
 # Full pipeline
-singularity exec dsnnr_4gpu_v5.sif python scripts/run_pipeline.py --sample ttbar --epochs 5
+singularity exec dsnnr_4gpu_v5.sif python scripts/run_pipeline.py --sample JZ7W --epochs 5
 
 # Or run steps individually (Recommended. Run each step individually for easier debugging and better control)
-singularity exec dsnnr_4gpu_v5.sif python scripts/prepare_data.py --sample ttbar --path data
-singularity exec dsnnr_4gpu_v5.sif python scripts/train_model.py --sample ttbar --path data --epochs 5
-singularity exec dsnnr_4gpu_v5.sif python scripts/evaluate_model.py --sample ttbar
+singularity exec dsnnr_4gpu_v5.sif python scripts/prepare_data.py --sample JZ7W --path data
+singularity exec dsnnr_4gpu_v5.sif python scripts/train_model.py --sample JZ7W --path data --epochs 5
+singularity exec dsnnr_4gpu_v5.sif python scripts/evaluate_model.py --sample JZ7W
 ```
 
 ## More Training examples
