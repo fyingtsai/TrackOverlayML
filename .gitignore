@@ -1,0 +1,41 @@
+# Byte-compiled / cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# OS junk
+.DS_Store
+
+# Editors / IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# Large / local artifacts (not for git)
+results/
+checkpoints/
+runs/
+logs/
+tmp/
+.cache/
+
+# Data (MC / Track overlay samples & matched files)
+data/MC-overlay_*/
+data/Track-overlay_*/
+data/matched_*.h5
+data/unmatched_*.h5
+data/*.root
+
+# Model files
+*.h5
+*.pkl
+*.onnx
+
+# Jupyter
+.ipynb_checkpoints/
+
