@@ -1,0 +1,34 @@
+[project]
+name = "trackoverlay-ml"
+version = "1.0.0"
+description = "ML-driven track overlay routing for ATLAS simulation"
+readme = "README.md"
+requires-python = ">=3.8"
+license = "MIT"                              # SPDX string (clears deprecation warning)
+authors = [{ name = "Fang-Ying Tsai", email = "fang-ying.tsai@cern.ch" }]
+keywords = ["machine-learning", "particle-physics", "ATLAS", "simulation"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Physics",
+]
+
+dependencies = [
+    "tensorflow>=2.8.0",
+    "numpy>=1.21.0",
+    "pandas>=1.3.0",
+    "scikit-learn>=1.0.0",
+    "matplotlib>=3.5.0",
+    "seaborn>=0.11.0",
+    "tables>=3.7.0",
+    "mplhep>=0.3.0",
+]
+
+[tool.setuptools.packages.find]
+include = ["network", "utils"]              # install these as packages
+exclude = ["data*", "scripts*", "tests*", "docs*"]  # do NOT try to package these
+
