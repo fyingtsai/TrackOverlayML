@@ -28,17 +28,30 @@ The framework requires ATLAS simulation data in specific formats:
 ```
 
 **Access:** These datasets are stored on CERN EOS and require ATLAS collaboration access rights.
+**To request access:**
+- Contact: fang-ying.tsai@cern.ch
 
 ## Quick Start
 
-### Using Singularity
+### Recommended: Using Singularity
+The easiest way to run this framework is using the pre-built Singularity container, which includes all dependencies:
 
 ```bash
 # Pull the container (only needed once)
 singularity pull docker://fyingtsai/dsnnr_4gpu:v5
-or on Perlmutter
+# or on Perlmutter
 podman-hpc pull docker://fyingtsai/dsnnr_4gpu:v5
+```
+### Alternative: Local Installation
 
+If you cannot use Singularity, install dependencies locally:
+
+```bash
+pip install tensorflow numpy pandas scikit-learn matplotlib seaborn tables mplhep
+```
+**Note:** All examples in this README assume Singularity usage. For local installation, remove the `singularity exec dsnnr_4gpu_v5.sif` prefix.
+
+**Example:**
 ```bash
 # Full pipeline
 singularity exec dsnnr_4gpu_v5.sif python scripts/run_pipeline.py --sample ttbar --epochs 5
@@ -50,30 +63,25 @@ singularity exec dsnnr_4gpu_v5.sif python scripts/evaluate_model.py --sample ttb
 ```
 
 ## More Training examples
+```bash
 # Train on balanced 10k + 10k
-python scripts/train_model.py --sample ttbar \
-    --matched_size 10000 --unmatched_size 10000
+singularity exec dsnnr_4gpu_v5.sif python scripts/train_model.py --sample ttbar --matched_size 10000 --unmatched_size 10000
 
 # Train on realistic imbalanced ratio (1:10)
-python scripts/train_model.py --sample ttbar \
-    --matched_size 5000 --unmatched_size 50000
+singularity exec dsnnr_4gpu_v5.sif python scripts/train_model.py --sample ttbar --matched_size 5000 --unmatched_size 50000
 
 # Use all matched, but limit unmatched
-python scripts/train_model.py --sample ttbar \
-    --unmatched_size 20000
-#######
+singularity exec dsnnr_4gpu_v5.sif python scripts/train_model.py --sample ttbar --unmatched_size 20000
+
 # Full pipeline with balanced training
-python scripts/run_pipeline.py --stage all --sample ttbar \
-    --path data --matched_size 5000 --unmatched_size 5000 --epochs 20
+singularity exec dsnnr_4gpu_v5.sif python scripts/run_pipeline.py --stage all --sample ttbar --path data --matched_size 5000 --unmatched_size 5000 --epochs 20
 
 # Full pipeline with cross-sample evaluation
-python scripts/run_pipeline.py --stage all --sample ttbar \
-    --eval_sample JZ7W
+singularity exec dsnnr_4gpu_v5.sif python scripts/run_pipeline.py --stage all --sample ttbar --eval_sample JZ7W
 
 # Just train on subset
-python scripts/run_pipeline.py --stage train --sample ttbar \
-    --matched_size 10000 --unmatched_size 10000
-
+singularity exec dsnnr_4gpu_v5.sif python scripts/run_pipeline.py --stage train --sample ttbar --matched_size 10000 --unmatched_size 10000
+```
 ## Project Structure
 
 ```
@@ -99,38 +107,38 @@ TrackOverlayML/
 
 ```bash
 # Step 1: Prepare data (merge MC/Track workflows)
-python scripts/prepare_data.py --sample ttbar --trainsplit 0.8
+singularity exec dsnnr_4gpu_v5.sif python scripts/prepare_data.py --sample ttbar --trainsplit 0.8
 
 # Step 2: Train model
-python scripts/train_model.py --sample ttbar --epochs 200
+singularity exec dsnnr_4gpu_v5.sif python scripts/train_model.py --sample ttbar --epochs 200
 
 # Step 3: Evaluate (same sample)
-python scripts/evaluate_model.py --sample ttbar
+singularity exec dsnnr_4gpu_v5.sif python scripts/evaluate_model.py --sample ttbar
 
 # Step 3b: Evaluate on different sample
-python scripts/evaluate_model.py --sample ttbar --eval_sample JZ7W
+singularity exec dsnnr_4gpu_v5.sif python scripts/evaluate_model.py --sample ttbar --eval_sample JZ7W
 ```
 
 ### Common Workflows
 
 **Train multiple models on same data:**
 ```bash
-python scripts/prepare_data.py --sample ttbar
-python scripts/train_model.py --sample ttbar --layers 32 16 8
-python scripts/train_model.py --sample ttbar --layers 64 32 16
+singularity exec dsnnr_4gpu_v5.sif python scripts/prepare_data.py --sample ttbar
+singularity exec dsnnr_4gpu_v5.sif python scripts/train_model.py --sample ttbar --layers 32 16 8
+singularity exec dsnnr_4gpu_v5.sif python scripts/train_model.py --sample ttbar --layers 64 32 16
 ```
 
 **Cross-sample evaluation:**
 ```bash
 # Train on ttbar, test on JZ7W
-python scripts/train_model.py --sample ttbar
-python scripts/prepare_data.py --sample JZ7W
-python scripts/evaluate_model.py --sample ttbar --eval_sample JZ7W
+singularity exec dsnnr_4gpu_v5.sif python scripts/train_model.py --sample ttbar
+singularity exec dsnnr_4gpu_v5.sif python scripts/prepare_data.py --sample JZ7W
+singularity exec dsnnr_4gpu_v5.sif python scripts/evaluate_model.py --sample ttbar --eval_sample JZ7W
 ```
 
 **Quick evaluation on subset:**
 ```bash
-python scripts/evaluate_model.py --sample ttbar --matched_size 5000 --unmatched_size 50000
+singularity exec dsnnr_4gpu_v5.sif python scripts/evaluate_model.py --sample ttbar --matched_size 5000 --unmatched_size 50000
 ```
 
 ## Key Arguments
@@ -144,8 +152,8 @@ python scripts/evaluate_model.py --sample ttbar --matched_size 5000 --unmatched_
 | `--epochs` | 200 | Training epochs |
 | `--lr` | 0.001 | Learning rate |
 | `--layers` | 16 10 8 | Hidden layer sizes |
-| `--matched_size` | None | Limit good match samples for eval |
-| `--unmatched_size` | None | Limit poor match samples for eval |
+| `--matched_size` | None | Limit matched samples for training/eval |
+| `--unmatched_size` | None | Limit unmatched samples for training/eval |
 
 Run `python scripts/run_pipeline.py --help` for full list.
 
