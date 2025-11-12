@@ -28,6 +28,7 @@ The framework requires ATLAS simulation data in specific formats:
 ```
 
 **Access:** These datasets are stored on CERN EOS and require ATLAS collaboration access rights.
+
 **To request access:**
 - Contact: fang-ying.tsai@cern.ch
 
@@ -46,6 +47,26 @@ podman-hpc pull docker://fyingtsai/dsnnr_4gpu:v5
 
 If you cannot use Singularity, install dependencies locally:
 
+**Option A: Using uv**
+```bash
+# Install uv if not already installed
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Create virtual environment and install dependencies
+uv venv
+source .venv/bin/activate
+uv pip install -e .
+```
+
+**Option B: Using Conda**
+```bash
+# Create environment from file
+conda env create -f environment.yml --prefix /path/to/your/scratch/trackoverlay-ml
+# Activate environment
+conda activate /path/to/your/scratch/trackoverlay-ml
+```
+
+**Option C: Using pip**
 ```bash
 pip install tensorflow numpy pandas scikit-learn matplotlib seaborn tables mplhep
 ```

@@ -23,6 +23,13 @@ runs/
 logs/
 tmp/
 .cache/
+./venv/
+venv/
+env/
+*.egg-info/
+.coverage
+.dist/
+build/
 
 # Data (MC / Track overlay samples & matched files)
 data/MC-overlay_*/
