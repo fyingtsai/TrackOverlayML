@@ -1,3 +1,5 @@
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+
 # TrackOverlayML Pipeline
 
 > **Note**: Refactored and documented with GitHub Copilot assistance. Based on ATLAS Collaboration code for ML-driven track overlay routing.

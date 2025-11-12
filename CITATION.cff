@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "TrackOverlayML: ML-driven Track Overlay Routing for ATLAS Simulation"
+version: 1.0.0
+date-released: 2025-11-11
+authors:
+  - family-names: "Tsai"
+    given-names: "Fang-Ying"
+    orcid: "https://orcid.org/0000-0001-7878-6435"
+url: "https://github.com/fyingtsai/TrackOverlayML"
+repository-code: "https://github.com/fyingtsai/TrackOverlayML"
+keywords:
+  - machine-learning
+  - particle-physics
+  - ATLAS
+  - simulation
+  - monte-carlo
+license: MIT
+
