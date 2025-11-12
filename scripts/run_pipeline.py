@@ -52,74 +52,88 @@ Examples:
         help="Pipeline stage to run: all (default), data, train, or eval"
     )
     
-    # Pass through other arguments to the scripts
+    # Pass through arguments to the scripts (matches args.py definitions)
     parser.add_argument("--path", type=str, default="data", help="Data directory path")
     parser.add_argument("--sample", type=str, default="JZ7W", help="Sample name")
-    parser.add_argument("--eval_sample", type=str, default=None, help="Sample for evaluation (if different from training)")
-    parser.add_argument("--trainsplit", type=float, default=0.8, help="Train/test split")
-    parser.add_argument("--usedensity", type=int, default=1, help="Use density features")
-    
-    # Sample size limits for balanced training
-    parser.add_argument("--matched_size", type=int, default=None, help="Limit number of matched samples")
-    parser.add_argument("--unmatched_size", type=int, default=None, help="Limit number of unmatched samples")
-    
-    # Training hyperparameters
-    parser.add_argument("--epochs", type=int, default=200, help="Number of training epochs")
-    parser.add_argument("--batchsize", type=int, default=200, help="Batch size")
-    parser.add_argument("--lr", type=float, default=0.001, help="Learning rate")
-    parser.add_argument("--layers", nargs="*", type=int, default=[16, 10, 8], help="Layer sizes")
-    
-    # Evaluation parameters
-    parser.add_argument("--xscore", type=str, default="simpleratio", help="XScore definition")
-    parser.add_argument("--rouletter", type=str, default="hard", help="Roulette type")
-    parser.add_argument("--sampler", type=str, default="uniform", help="Sampler type")
-    parser.add_argument("--temperature", type=float, default=0.00005, help="Temperature for smart roulette")
-    parser.add_argument("--evtmix", type=str, default="None", help="Event mix type")
     parser.add_argument("--seed", type=int, default=23, help="Random seed")
+    parser.add_argument("--trainsplit", type=float, default=0.8, help="Train/test split")
+    parser.add_argument("--layers", nargs="*", type=int, default=[45, 35, 30], help="Layer sizes")
+    parser.add_argument("--lr", type=float, default=0.001, help="Learning rate")
+    parser.add_argument("--epochs", type=int, default=100, help="Number of training epochs")
+    parser.add_argument("--batchsize", type=int, default=80, help="Batch size")
+    parser.add_argument("--patience", type=int, default=20, help="Early stopping patience")
+    parser.add_argument("--rouletter", type=str, default="smart", help="Roulette type")
+    parser.add_argument("--temperature", type=float, default=0.00005, help="Temperature for smart roulette")
+    parser.add_argument("--xscore", type=str, default="simpleratio", help="XScore definition")
+    parser.add_argument("--evtmix", type=str, default="None", help="Event mix type")
+    parser.add_argument("--usedensity", type=int, default=1, help="Use density features")
+    parser.add_argument("--eval_sample", type=str, default=None, help="Sample for evaluation (if different)")
+    parser.add_argument("--matched_size", type=int, default=None, help="Number of matched samples")
+    parser.add_argument("--unmatched_size", type=int, default=None, help="Number of unmatched samples")
     
     args = parser.parse_args()
-    
-    # Build argument list to pass to subscripts
-    args_list = [
-        f"--path={args.path}",
-        f"--sample={args.sample}",
-        f"--trainsplit={args.trainsplit}",
-        f"--usedensity={args.usedensity}",
-        f"--epochs={args.epochs}",
-        f"--batchsize={args.batchsize}",
-        f"--lr={args.lr}",
-        f"--layers"] + [str(l) for l in args.layers] + [
-        f"--xscore={args.xscore}",
-        f"--rouletter={args.rouletter}",
-        f"--sampler={args.sampler}",
-        f"--temperature={args.temperature}",
-        f"--evtmix={args.evtmix}",
-        f"--seed={args.seed}",
-    ]
-    
-    # Add optional arguments if specified
-    if args.matched_size is not None:
-        args_list.append(f"--matched_size={args.matched_size}")
-    if args.unmatched_size is not None:
-        args_list.append(f"--unmatched_size={args.unmatched_size}")
-    if args.eval_sample is not None:
-        args_list.append(f"--eval_sample={args.eval_sample}")
     
     # Get the scripts directory
     scripts_dir = os.path.dirname(os.path.abspath(__file__))
     
-    # Run pipeline stages
+    # Run pipeline stages with stage-specific arguments
     if args.stage in ["all", "data"]:
         prepare_script = os.path.join(scripts_dir, "prepare_data.py")
-        run_step(prepare_script, args_list, "Data Preparation")
+        # prepare_data.py only needs: path, sample, seed, trainsplit, usedensity
+        prepare_args = [
+            f"--path={args.path}",
+            f"-sn={args.sample}",
+            f"-s={args.seed}",
+            f"--trainsplit={args.trainsplit}",
+            f"-ud={args.usedensity}",
+        ]
+        run_step(prepare_script, prepare_args, "Data Preparation")
     
     if args.stage in ["all", "train"]:
         train_script = os.path.join(scripts_dir, "train_model.py")
-        run_step(train_script, args_list, "Model Training")
+        # train_model.py needs all training parameters
+        train_args = [
+            f"--path={args.path}",
+            f"-sn={args.sample}",
+            f"-s={args.seed}",
+            f"--trainsplit={args.trainsplit}",
+            f"-ud={args.usedensity}",
+            f"--epochs={args.epochs}",
+            f"-bs={args.batchsize}",
+            f"-lr={args.lr}",
+            f"--layers"] + [str(l) for l in args.layers] + [
+            f"-p={args.patience}",
+            f"-xs={args.xscore}",
+            f"-rltr={args.rouletter}",
+            f"-temp={args.temperature}",
+            f"-em={args.evtmix}",
+        ]
+        if args.matched_size is not None:
+            train_args.append(f"--matched_size={args.matched_size}")
+        if args.unmatched_size is not None:
+            train_args.append(f"--unmatched_size={args.unmatched_size}")
+        run_step(train_script, train_args, "Model Training")
     
     if args.stage in ["all", "eval"]:
         eval_script = os.path.join(scripts_dir, "evaluate_model.py")
-        run_step(eval_script, args_list, "Model Evaluation")
+        # evaluate_model.py needs evaluation parameters
+        eval_args = [
+            f"--path={args.path}",
+            f"-sn={args.sample}",
+            f"-s={args.seed}",
+            f"-ud={args.usedensity}",
+            f"-xs={args.xscore}",
+            f"-rltr={args.rouletter}",
+            f"-temp={args.temperature}",
+            f"-em={args.evtmix}",
+        ]
+        if args.eval_sample is not None:
+            eval_args.append(f"--eval_sample={args.eval_sample}")
+        if args.matched_size is not None:
+            eval_args.append(f"--matched_size={args.matched_size}")
+        if args.unmatched_size is not None:
+            eval_args.append(f"--unmatched_size={args.unmatched_size}")
+        run_step(eval_script, eval_args, "Model Evaluation")
     
     print("\n" + "="*60)
     print("="*60)

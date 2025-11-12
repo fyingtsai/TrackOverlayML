@@ -69,8 +69,9 @@ conda activate /path/to/your/scratch/trackoverlay-ml
 
 **Option C: Using pip**
 ```bash
-pip install tensorflow numpy pandas scikit-learn matplotlib seaborn tables mplhep
+pip install "tensorflow>=2.8.0" "numpy>=1.21.0" "pandas>=1.3.0" "scikit-learn>=1.0.0" "matplotlib>=3.5.0,<3.9.0" "seaborn>=0.11.0" "tables>=3.7.0" "statsmodels>=0.13.0" "mplhep>=0.3.28,<0.4.0" "xarray>=0.20.0"
 ```
+
 **Note:** All examples in this README assume Singularity usage. For local installation, remove the `singularity exec dsnnr_4gpu_v5.sif` prefix.
 
 **Example:**
@@ -171,9 +172,12 @@ singularity exec dsnnr_4gpu_v5.sif python scripts/evaluate_model.py --sample ttb
 | `--sample` | `JZ7W` | Sample name (ttbar, JZ7W, etc.) |
 | `--eval_sample` | None | Different sample for evaluation |
 | `--trainsplit` | 0.8 | Train/test split ratio |
-| `--epochs` | 200 | Training epochs |
+| `--epochs` | 100 | Training epochs |
+| `--batchsize` | 80 | Batch size |
 | `--lr` | 0.001 | Learning rate |
-| `--layers` | 16 10 8 | Hidden layer sizes |
+| `--layers` | 45 35 30 | Hidden layer sizes |
+| `--patience` | 20 | Early stopping patience |
+| `--rouletter` | `smart` | Roulette type (smart/hard) |
 | `--matched_size` | None | Limit matched samples for training/eval |
 | `--unmatched_size` | None | Limit unmatched samples for training/eval |
 
